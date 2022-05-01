@@ -19,7 +19,6 @@ func NewRestServer(name string) *RestServer {
 	if err := s.SetConfigWithMap(serverCfg); err != nil {
 		panic(err)
 	}
-	s.SetDumpRouterMap(false)
 
 	// error handler
 	s.Use(middleware.Exception)

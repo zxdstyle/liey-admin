@@ -3,11 +3,15 @@ package bases
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/zxdstyle/liey-admin/framework/http/requests"
+	"github.com/zxdstyle/liey-admin/framework/http/responses"
+	"gorm.io/gorm"
 )
 
 type (
 	RepositoryModel interface {
 		GetKey() uint
+		SetKey(id uint)
 		GetCreatedAt() *gtime.Time
 		GetUpdatedAt() *gtime.Time
 	}
@@ -16,11 +20,25 @@ type (
 		GetModel(i int) RepositoryModel
 	}
 
+	HasPreload interface {
+		Preload(resource requests.Resource) Filter
+	}
+
 	Logic interface {
 		Show(ctx context.Context, with []string, mo RepositoryModel) error
 	}
 
 	Repository interface {
-		Show(ctx context.Context, with []string, mo RepositoryModel) error
+		Paginate(ctx context.Context, req requests.Request, paginator *responses.Paginator) error
+		All(ctx context.Context, req requests.Request, mos RepositoryModels) error
+		Show(ctx context.Context, with requests.Resources, mo RepositoryModel) error
+		Create(ctx context.Context, mo RepositoryModel) error
+		BatchCreate(ctx context.Context, mos RepositoryModels) error
+		Update(ctx context.Context, mo RepositoryModel) error
+		BatchUpdate(ctx context.Context, mos RepositoryModels) error
+		Destroy(ctx context.Context, mo RepositoryModel) error
+		DestroyById(ctx context.Context, ids ...uint) error
 	}
+
+	Filter func(tx *gorm.DB) *gorm.DB
 )

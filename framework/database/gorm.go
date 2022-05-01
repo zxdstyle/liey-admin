@@ -25,7 +25,7 @@ func ConnectGorm() *gorm.DB {
 		panic(err)
 	}
 
-	if cfg.MustGet(ctx, "debug", false).Bool() {
+	if g.Cfg("app").MustGet(ctx, "debug", false).Bool() {
 		db = db.Debug()
 	}
 

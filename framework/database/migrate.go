@@ -25,19 +25,20 @@ func RegisterMigration(group string, migration ...Migration) error {
 	return nil
 }
 
-func GetMigrations(groups ...string) (mis map[string]Migration) {
+func GetMigrations(groups ...string) map[string]Migration {
+	mis := make(map[string]Migration)
 	if len(groups) == 0 {
 		migrations.Iterator(func(k string, v interface{}) bool {
 			mis[k] = v.(Migration)
 			return true
 		})
-		return
+		return mis
 	}
 
 	for _, group := range groups {
 		mis[group] = migrations.Get(group).(Migration)
 	}
-	return
+	return mis
 }
 
 func GetMigration(group string) Migration {

@@ -44,6 +44,6 @@ func Created(data interface{}) *Response {
 	return Custom(data, http.StatusCreated, "Created")
 }
 
-func NoContent(data interface{}) *Response {
-	return Custom(data, http.StatusNoContent, "Deleted")
+func NoContent() *Response {
+	return Custom(nil, http.StatusNoContent, "Deleted")
 }

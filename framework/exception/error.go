@@ -8,6 +8,8 @@ import (
 var (
 	ErrNotRegisterKernel      = errors.New("please register the kernel")
 	ErrRepeatedRegisterKernel = errors.New("please do not repeated register the kernel")
+
+	ErrInvalidOrderArgument = errors.New("invalid sort parameter")
 )
 
 // migration

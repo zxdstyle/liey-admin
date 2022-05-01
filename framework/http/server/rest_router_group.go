@@ -18,7 +18,7 @@ func (router RouterGroup) Resource(resource string, handler RestHandler) {
 
 	router.group.GET(getResourceUriIndex(resource, base), wrapHandler(handler.Index))
 	router.group.GET(getResourceUriShow(resource, base), wrapHandler(handler.Show))
-	router.group.POST(getResourceUriCreate(resource, base), wrapHandler(handler.Create))
+	router.group.POST(getResourceUriStore(resource, base), wrapHandler(handler.Create))
 	router.group.PUT(getResourceUriUpdate(resource, base), wrapHandler(handler.Update))
 	router.group.DELETE(getResourceUriDestroy(resource, base), wrapHandler(handler.Destroy))
 }

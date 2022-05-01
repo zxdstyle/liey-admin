@@ -18,12 +18,21 @@ var (
 			ctx := context.Background()
 			if len(args) == 0 {
 				multiMigrateData(ctx)
+			} else {
+				migrateData(ctx, args...)
 			}
-
-			instances.DB().AutoMigrate()
 		},
 	}
 )
+
+func migrateData(ctx context.Context, keys ...string) {
+	data := database.GetMigrations(keys...)
+	for _, migration := range data {
+		if err := migrate(ctx, migration.Models()...); err != nil {
+			g.Log().Fatal(ctx, err)
+		}
+	}
+}
 
 func multiMigrateData(ctx context.Context) {
 	options := database.AllMigrationKeys()
