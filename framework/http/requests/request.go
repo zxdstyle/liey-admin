@@ -11,6 +11,7 @@ import (
 type (
 	Request interface {
 		GetGRequest() *ghttp.Request
+		Parse(pointer interface{}) error
 		Validate(pointer interface{}) error
 		ResourceID(key string) uint
 		GetWithResources() Resources

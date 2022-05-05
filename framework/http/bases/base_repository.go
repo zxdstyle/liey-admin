@@ -50,6 +50,32 @@ func (repo GormRepository) Show(ctx context.Context, with requests.Resources, mo
 	return tx.First(mo).Error
 }
 
+func (repo GormRepository) ExistsByKeys(ctx context.Context, keys []uint, exists *bool) error {
+	var count int64
+	if err := repo.CountByKeys(ctx, keys, &count); err != nil {
+		return err
+	}
+	*exists = count == int64(len(keys))
+	return nil
+}
+
+func (repo GormRepository) Exists(ctx context.Context, mo RepositoryModel, exists *bool) error {
+	var count int64
+	if err := repo.Count(ctx, mo, &count); err != nil {
+		return err
+	}
+	*exists = count > 0
+	return nil
+}
+
+func (repo GormRepository) Count(ctx context.Context, mo RepositoryModel, count *int64) error {
+	return repo.Orm.WithContext(ctx).Where(mo).Count(count).Error
+}
+
+func (repo GormRepository) CountByKeys(ctx context.Context, keys []uint, count *int64) error {
+	return repo.Orm.WithContext(ctx).Where("id IN ?", keys).Count(count).Error
+}
+
 func (repo GormRepository) Create(ctx context.Context, mo RepositoryModel) error {
 	return repo.Orm.WithContext(ctx).Omit(clause.Associations).Create(mo).Error
 }

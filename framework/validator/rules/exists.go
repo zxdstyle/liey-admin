@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gvalid"
-	"github.com/zxdstyle/liey-admin/framework/adm/instances"
+	"github.com/zxdstyle/liey-admin/framework/database"
 )
 
 // ExistsRule exists:table,field,ignore
@@ -46,7 +46,8 @@ func (ExistsRule) Rule() gvalid.RuleFunc {
 		}
 
 		var count int64
-		if err := instances.DB().WithContext(ctx).Table(table).Where(fmt.Sprintf("%s = ?", field), in.Value.Val()).Count(&count).Error; err != nil {
+		// todo
+		if err := database.GetDB("default").WithContext(ctx).Table(table).Where(fmt.Sprintf("%s = ?", field), in.Value.Val()).Count(&count).Error; err != nil {
 			return err
 		}
 

@@ -3,6 +3,7 @@ package requests
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
+	"github.com/zxdstyle/liey-admin/framework/validator"
 	"gorm.io/gorm"
 )
 
@@ -27,6 +28,13 @@ func (rest RestRequest) GetGRequest() *ghttp.Request {
 
 func (rest RestRequest) Validate(pointer interface{}) error {
 	return rest.r.Parse(pointer)
+}
+
+func (rest RestRequest) Parse(pointer interface{}) error {
+	if err := rest.r.GetStruct(pointer); err != nil {
+		return err
+	}
+	return validator.Instance.Parse(rest.r.Context(), pointer)
 }
 
 func (rest RestRequest) ResourceID(key string) uint {

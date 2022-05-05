@@ -3,12 +3,22 @@ package database
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/container/gmap"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/zxdstyle/liey-admin/framework/database/config"
+	"github.com/zxdstyle/liey-admin/framework/database/driver"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
-func ConnectGorm() *gorm.DB {
+var (
+	cfg            config.Config
+	connectionPool = gmap.NewStrAnyMap(true)
+)
+
+func connectGorm() *gorm.DB {
 	ctx := context.Background()
 
 	cfg := g.Cfg("database")
@@ -30,4 +40,56 @@ func ConnectGorm() *gorm.DB {
 	}
 
 	return db
+}
+
+func init() {
+	ctx := context.Background()
+	val := g.Cfg("database").MustData(ctx)
+	if err := gconv.Scan(val, &cfg); err != nil {
+		panic(err)
+	}
+
+	initDialectors(cfg.Connections)
+
+	connect(cfg.Connections)
+}
+
+func connect(connections map[string]config.Connection) {
+	for name, connection := range connections {
+		dial := dialectors.Get(name)
+		db, er := gorm.Open(dial)
+		if er != nil {
+			panic(er)
+		}
+
+		policy, e := connection.GetPolicy()
+		if e != nil {
+			panic(e)
+		}
+
+		if err := db.Use(dbresolver.Register(dbresolver.Config{
+			Sources:  []gorm.Dialector{},
+			Replicas: []gorm.Dialector{},
+			Policy:   policy,
+		})); err != nil {
+			panic(err)
+		}
+
+		connectionPool.Set(name, db)
+	}
+}
+
+func initDialectors(options map[string]config.Connection) {
+	for name, option := range options {
+		dr := driver.GetDriver(option.Driver)
+		dialectors.Set(name, dr.Dialector(option))
+	}
+}
+
+func GetDB(name string) *gorm.DB {
+	val, ok := connectionPool.Search(name)
+	if !ok {
+		return nil
+	}
+	return val.(*gorm.DB)
 }

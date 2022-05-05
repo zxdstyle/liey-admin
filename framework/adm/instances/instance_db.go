@@ -5,12 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	frameCoreDatabase = "liey.core.database"
-)
-
-func DB() *gorm.DB {
-	return instances.GetOrSetFunc(frameCoreDatabase, func() interface{} {
-		return database.ConnectGorm()
-	}).(*gorm.DB)
+func DB(name ...string) *gorm.DB {
+	key := "default"
+	if len(name) > 0 {
+		key = name[0]
+	}
+	return database.GetDB(key)
 }

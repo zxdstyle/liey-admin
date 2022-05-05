@@ -1,4 +1,4 @@
-package database
+package migrations
 
 import (
 	"github.com/gogf/gf/v2/container/gmap"

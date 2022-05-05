@@ -6,7 +6,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/spf13/cobra"
 	"github.com/zxdstyle/liey-admin/framework/adm/instances"
-	"github.com/zxdstyle/liey-admin/framework/database"
+	"github.com/zxdstyle/liey-admin/framework/database/migrations"
 	"github.com/zxdstyle/liey-admin/framework/http/bases"
 )
 
@@ -26,7 +26,7 @@ var (
 )
 
 func migrateData(ctx context.Context, keys ...string) {
-	data := database.GetMigrations(keys...)
+	data := migrations.GetMigrations(keys...)
 	for _, migration := range data {
 		if err := migrate(ctx, migration.Models()...); err != nil {
 			g.Log().Fatal(ctx, err)
@@ -35,7 +35,7 @@ func migrateData(ctx context.Context, keys ...string) {
 }
 
 func multiMigrateData(ctx context.Context) {
-	options := database.AllMigrationKeys()
+	options := migrations.AllMigrationKeys()
 
 	sv := &survey.Select{
 		Message: "Please select the data to migrate",
@@ -47,7 +47,7 @@ func multiMigrateData(ctx context.Context) {
 		g.Log().Fatal(ctx, err)
 	}
 
-	mi := database.GetMigration(migrateKey)
+	mi := migrations.GetMigration(migrateKey)
 	if mi == nil {
 		g.Log().Fatal(ctx, "Incorrect migration data selected")
 	}

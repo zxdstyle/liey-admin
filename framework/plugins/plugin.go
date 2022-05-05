@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/container/gmap"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/zxdstyle/liey-admin/framework/database"
+	"github.com/zxdstyle/liey-admin/framework/database/migrations"
 	"github.com/zxdstyle/liey-admin/framework/exception"
 )
 
@@ -12,7 +12,7 @@ type (
 	Plugin interface {
 		Name() string
 		Boot() error
-		Migrations() []database.Migration
+		Migrations() []migrations.Migration
 	}
 )
 
@@ -29,7 +29,7 @@ func RegisterPlugin(ctx context.Context, plugins ...Plugin) error {
 			return err
 		}
 
-		if err := database.RegisterMigration(name, plugin.Migrations()...); err != nil {
+		if err := migrations.RegisterMigration(name, plugin.Migrations()...); err != nil {
 			return err
 		}
 
