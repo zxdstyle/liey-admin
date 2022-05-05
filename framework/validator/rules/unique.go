@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"github.com/gogf/gf/v2/text/gstr"
+	"github.com/zxdstyle/liey-admin/framework/database"
 )
 
 // UniqueRule unique=db.table field ignoreFieldName
@@ -11,56 +13,68 @@ type UniqueRule struct {
 }
 
 func (UniqueRule) Name() string {
-	return "unique"
+	return "unique-db"
+}
+
+func (UniqueRule) Message() string {
+	return "The {0} already exists."
+}
+
+func (UniqueRule) Translate(err validator.FieldError) []string {
+	return []string{
+		err.Field(),
+	}
 }
 
 func (UniqueRule) Rule() validator.FuncCtx {
 	return func(ctx context.Context, fl validator.FieldLevel) bool {
-		fmt.Println(fl.Param())
-		//rs := gstr.Split(in.Rule, ":")
-		//if len(rs) == 0 {
-		//	return nil
-		//}
-		//
-		//if len(rs) == 1 {
-		//	return fmt.Errorf("validation rule exists requires at least 1 parameters")
-		//}
-		//
-		//args := gstr.Split(rs[1], ",")
-		//if len(args) == 0 {
-		//	return fmt.Errorf("validation rule exists requires at least 1 parameters")
-		//}
-		//
-		//field := "id"
-		//table := args[0]
-		//if len(args) >= 2 {
-		//	field = args[1]
-		//}
-		//
-		//if in.Value.IsEmpty() {
-		//	return nil
-		//}
-		//
-		//var count int64
-		//query := instances.DB().WithContext(ctx).Table(table).Where(fmt.Sprintf("%s = ?", field), in.Value.Val())
-		//
-		//data := in.Data.MapStrVar()
-		//if val, ok := data["id"]; ok && !val.IsEmpty() {
-		//	query = query.Where("id <> ?", val.Int())
-		//}
-		//
-		//if err := query.Count(&count).Error; err != nil {
-		//	return err
-		//}
-		//
-		//if count > 0 {
-		//	msg := gstr.ReplaceByMap(in.Message, map[string]string{
-		//		"{attribute}": field,
-		//		"{value}":     in.Value.String(),
-		//	})
-		//	return fmt.Errorf(msg)
-		//}
+		var (
+			db    string
+			table string
+			field = gstr.CaseSnake(fl.FieldName())
+		)
+		rs := gstr.Split(fl.Param(), " ")
+		if len(rs) == 0 {
+			return false
+		}
 
-		return false
+		db, table = resolveTable(rs[0])
+		l := len(rs)
+		if l >= 2 {
+			field = rs[1]
+		}
+
+		p := fl.Parent()
+		val, _, _, _ := fl.GetStructFieldOKAdvanced2(fl.Parent(), "id")
+		fmt.Println(p.FieldByName("ID").Interface(), val, db, table, field)
+		var count int64
+		query := database.GetDB(db).WithContext(ctx).Table(table).Where(fmt.Sprintf("`%s` = ?", field), fl.Field().Interface())
+
+		//data := in.Data.MapStrVar()
+		key := p.FieldByName("ID")
+		if !key.IsZero() {
+			query = query.Where("`id` <> ?", key.Interface())
+		}
+
+		if err := query.Count(&count).Error; err != nil {
+			return false
+		}
+
+		return count == 0
 	}
+}
+
+func resolveTable(p string) (db string, table string) {
+	database := gstr.Split(p, ".")
+	switch len(database) {
+	case 2:
+		db = database[0]
+		table = database[1]
+	case 1:
+		table = database[0]
+	}
+	if len(db) == 0 {
+		db = "default"
+	}
+	return
 }

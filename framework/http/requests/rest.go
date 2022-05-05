@@ -27,7 +27,10 @@ func (rest RestRequest) GetGRequest() *ghttp.Request {
 }
 
 func (rest RestRequest) Validate(pointer interface{}) error {
-	return rest.r.Parse(pointer)
+	if err := rest.r.GetStruct(pointer); err != nil {
+		return err
+	}
+	return validator.Instance.Validate(rest.r.Context(), pointer)
 }
 
 func (rest RestRequest) Parse(pointer interface{}) error {

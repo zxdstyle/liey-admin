@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.4
 	github.com/fatih/color v1.13.0
-	github.com/go-playground/validator/v10 v10.11.0
+	github.com/go-playground/validator/v10 v10.9.0
 	github.com/gogf/gf/v2 v2.0.6
 	github.com/jinzhu/inflection v1.0.0
 	github.com/olekukonko/tablewriter v0.0.5
@@ -40,9 +40,9 @@ require (
 	go.opentelemetry.io/otel v1.0.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.0.0 // indirect
 	go.opentelemetry.io/otel/trace v1.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
-	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32 // indirect
+	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171 // indirect
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect

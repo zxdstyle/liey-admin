@@ -5,7 +5,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/gvalid"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
-	"github.com/zxdstyle/liey-admin/framework/validator/translator"
+	validate "github.com/zxdstyle/liey-admin/framework/validator"
 	"gorm.io/gorm"
 	"net/http"
 )
@@ -50,7 +50,7 @@ func rejectError(err error) (resp *responses.Response) {
 	case gvalid.Error:
 		return responses.Error(err.(gvalid.Error).FirstError(), http.StatusUnprocessableEntity)
 	case validator.ValidationErrors:
-		return responses.Failed(translator.FirstErrorMsg(err.(validator.ValidationErrors)), http.StatusUnprocessableEntity)
+		return responses.Failed(validate.FirstErrorMsg(err.(validator.ValidationErrors)), http.StatusUnprocessableEntity)
 	default:
 		if exce, ok := exceptions[err]; ok {
 			return exce(err)

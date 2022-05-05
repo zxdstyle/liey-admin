@@ -24,7 +24,7 @@ type (
 
 func (orders Orders) Query(tx *gorm.DB) *gorm.DB {
 	for _, order := range orders {
-		tx = tx.Order(fmt.Sprintf("%s %s", order.OrderBy, order.Order))
+		tx = tx.Order(fmt.Sprintf("`%s` %s", order.Order, order.OrderBy))
 	}
 	return tx
 }
@@ -32,7 +32,9 @@ func (orders Orders) Query(tx *gorm.DB) *gorm.DB {
 func parseOrder(r *ghttp.Request) (Orders, error) {
 	query := r.GetQuery("_order")
 	if query.IsEmpty() {
-		return Orders{}, nil
+		return Orders{
+			{Order: "id", OrderBy: OrderByDesc},
+		}, nil
 	}
 
 	if !query.IsMap() {

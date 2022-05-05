@@ -7,6 +7,8 @@ import (
 type Rule interface {
 	Name() string
 	Rule() validator.FuncCtx
+	Message() string
+	Translate(err validator.FieldError) []string
 }
 
 var customRules = []Rule{

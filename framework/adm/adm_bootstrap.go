@@ -5,7 +5,6 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/zxdstyle/liey-admin/framework/logger"
 	"github.com/zxdstyle/liey-admin/framework/plugins"
-	"github.com/zxdstyle/liey-admin/framework/translation"
 )
 
 func bootstrap(ctx context.Context) {
@@ -21,7 +20,4 @@ func bootstrap(ctx context.Context) {
 	if err := plugins.RegisterPlugin(ctx, kernel.Plugins()...); err != nil {
 		g.Log().Fatal(ctx, err)
 	}
-
-	// 加载默认多语言资源
-	translation.Translator().LoadDefaultTranslations()
 }

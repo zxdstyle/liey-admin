@@ -6,7 +6,6 @@ import (
 	"github.com/zxdstyle/liey-admin/console"
 	"github.com/zxdstyle/liey-admin/framework/adm/instances"
 	"github.com/zxdstyle/liey-admin/framework/http/server"
-	"github.com/zxdstyle/liey-admin/framework/translation"
 	"gorm.io/gorm"
 )
 
@@ -29,10 +28,6 @@ func Start() {
 	bootstrap(ctx)
 
 	console.Execute()
-}
-
-func I18n() *translation.Translation {
-	return translation.Translator()
 }
 
 func Server() *server.RestServer {

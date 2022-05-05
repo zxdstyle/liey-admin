@@ -49,12 +49,15 @@ func init() {
 		panic(err)
 	}
 
+	debug, _ := g.Cfg("app").Get(ctx, "debug", false)
+
 	initDialectors(cfg.Connections)
 
-	connect(cfg.Connections)
+	connect(cfg.Connections, debug.Bool())
 }
 
-func connect(connections map[string]config.Connection) {
+func connect(connections map[string]config.Connection, debug bool) {
+
 	for name, connection := range connections {
 		dial := dialectors.Get(name)
 		db, er := gorm.Open(dial)
@@ -73,6 +76,10 @@ func connect(connections map[string]config.Connection) {
 			Policy:   policy,
 		})); err != nil {
 			panic(err)
+		}
+
+		if debug {
+			db = db.Debug()
 		}
 
 		connectionPool.Set(name, db)
