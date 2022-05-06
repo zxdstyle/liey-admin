@@ -26,6 +26,19 @@ func (d Dialector) Get(name string) gorm.Dialector {
 	return val
 }
 
+func (d Dialector) Gets(name ...string) (dials []gorm.Dialector) {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+
+	for _, key := range name {
+		val, ok := d.data[key]
+		if ok {
+			dials = append(dials, val)
+		}
+	}
+	return
+}
+
 func (d Dialector) Set(name string, dial gorm.Dialector) {
 	d.mu.Lock()
 	defer d.mu.Unlock()

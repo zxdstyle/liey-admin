@@ -3,7 +3,6 @@ package middleware
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/util/gvalid"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	validate "github.com/zxdstyle/liey-admin/framework/validator"
 	"gorm.io/gorm"
@@ -47,14 +46,12 @@ func isSuccess(status int) bool {
 
 func rejectError(err error) (resp *responses.Response) {
 	switch err.(type) {
-	case gvalid.Error:
-		return responses.Error(err.(gvalid.Error).FirstError(), http.StatusUnprocessableEntity)
 	case validator.ValidationErrors:
 		return responses.Failed(validate.FirstErrorMsg(err.(validator.ValidationErrors)), http.StatusUnprocessableEntity)
 	default:
 		if exce, ok := exceptions[err]; ok {
 			return exce(err)
 		}
-		return responses.Error(err, http.StatusInternalServerError)
+		return responses.Error(err, http.StatusBadRequest)
 	}
 }

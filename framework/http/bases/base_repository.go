@@ -30,7 +30,10 @@ func (repo GormRepository) Paginate(ctx context.Context, req requests.Request, p
 
 	tx = repo.loadResources(tx, req.GetWithResources(), paginator.Data.(RepositoryModels).GetModel(0))
 
-	return req.Paginate(tx).Find(paginator.Data).Error
+	page := req.GetPage()
+	pageSize := req.GetPageSize()
+	offset := (page - 1) * pageSize
+	return tx.Offset(offset).Limit(pageSize).Find(paginator.Data).Error
 }
 
 func (repo GormRepository) All(ctx context.Context, req requests.Request, mos RepositoryModels) error {

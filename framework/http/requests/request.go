@@ -10,7 +10,7 @@ import (
 
 type (
 	Request interface {
-		GetGRequest() *ghttp.Request
+		GetRequest() *ghttp.Request
 		Parse(pointer interface{}) error
 		Validate(pointer interface{}) error
 		ResourceID(key string) uint
@@ -23,7 +23,6 @@ type (
 		GetSelects() Selects
 		GetOrder() (Orders, error)
 		ToQuery(tx *gorm.DB) (*gorm.DB, error)
-		Paginate(tx *gorm.DB) *gorm.DB
 	}
 )
 

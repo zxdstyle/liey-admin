@@ -15,12 +15,27 @@ func newRouterGroup(group *ghttp.RouterGroup) *RouterGroup {
 
 func (router RouterGroup) Resource(resource string, handler RestHandler) {
 	base := getBaseName(resource)
+	router.GET(getResourceUriIndex(resource, base), handler.Index)
+	router.GET(getResourceUriShow(resource, base), handler.Show)
+	router.POST(getResourceUriStore(resource, base), handler.Create)
+	router.PUT(getResourceUriUpdate(resource, base), handler.Update)
+	router.DELETE(getResourceUriDestroy(resource, base), handler.Destroy)
+}
 
-	router.group.GET(getResourceUriIndex(resource, base), wrapHandler(handler.Index))
-	router.group.GET(getResourceUriShow(resource, base), wrapHandler(handler.Show))
-	router.group.POST(getResourceUriStore(resource, base), wrapHandler(handler.Create))
-	router.group.PUT(getResourceUriUpdate(resource, base), wrapHandler(handler.Update))
-	router.group.DELETE(getResourceUriDestroy(resource, base), wrapHandler(handler.Destroy))
+func (router RouterGroup) GET(path string, handler RestHandlerFunc) {
+	router.group.GET(path, wrapHandler(handler))
+}
+
+func (router RouterGroup) POST(path string, handler RestHandlerFunc) {
+	router.group.POST(path, wrapHandler(handler))
+}
+
+func (router RouterGroup) PUT(path string, handler RestHandlerFunc) {
+	router.group.PUT(path, wrapHandler(handler))
+}
+
+func (router RouterGroup) DELETE(path string, handler RestHandlerFunc) {
+	router.group.DELETE(path, wrapHandler(handler))
 }
 
 func (router RouterGroup) Group(prefix string, handle func(group *RouterGroup)) {

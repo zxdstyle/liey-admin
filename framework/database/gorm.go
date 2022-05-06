@@ -18,6 +18,12 @@ var (
 	connectionPool = gmap.NewStrAnyMap(true)
 )
 
+type (
+	Connector interface {
+		Connection() string
+	}
+)
+
 func connectGorm() *gorm.DB {
 	ctx := context.Background()
 
@@ -71,8 +77,8 @@ func connect(connections map[string]config.Connection, debug bool) {
 		}
 
 		if err := db.Use(dbresolver.Register(dbresolver.Config{
-			Sources:  []gorm.Dialector{},
-			Replicas: []gorm.Dialector{},
+			Sources:  dialectors.Gets(connection.Sources...),
+			Replicas: dialectors.Gets(connection.Replicas...),
 			Policy:   policy,
 		})); err != nil {
 			panic(err)

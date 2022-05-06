@@ -35,6 +35,10 @@ func (rest RestServer) Group(prefix string, handle func(group *RouterGroup)) {
 	})
 }
 
+func (rest RestServer) Routes() []ghttp.RouterItem {
+	return rest.server.GetRoutes()
+}
+
 func (rest RestServer) Run() {
 	rest.server.Run()
 }

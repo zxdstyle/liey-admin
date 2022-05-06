@@ -2,6 +2,8 @@ package requests
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/zxdstyle/liey-admin/framework/auth/authenticate"
+	"github.com/zxdstyle/liey-admin/framework/auth/guards"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	"github.com/zxdstyle/liey-admin/framework/validator"
 	"gorm.io/gorm"
@@ -22,7 +24,7 @@ func ParseRequest(r *ghttp.Request) *RestRequest {
 	}
 }
 
-func (rest RestRequest) GetGRequest() *ghttp.Request {
+func (rest RestRequest) GetRequest() *ghttp.Request {
 	return rest.r
 }
 
@@ -87,13 +89,6 @@ func (rest RestRequest) ToQuery(tx *gorm.DB) (*gorm.DB, error) {
 	return tx, nil
 }
 
-func (rest RestRequest) Paginate(tx *gorm.DB) *gorm.DB {
-	page := rest.GetPage()
-	pageSize := rest.GetPageSize()
-	offset := (page - 1) * pageSize
-	return tx.Offset(offset).Limit(pageSize)
-}
-
 func (rest RestRequest) GetPage() int {
 	return rest.r.GetQuery("page", 1).Int()
 }
@@ -103,7 +98,7 @@ func (rest RestRequest) GetPageSize() int {
 }
 
 func (rest RestRequest) GetLimit() int {
-	return allDataLimit
+	return rest.r.GetQuery("limit", allDataLimit).Int()
 }
 
 func (rest RestRequest) NeedPaginate() bool {
@@ -116,4 +111,23 @@ func (rest RestRequest) Paginator(mo interface{}) *responses.Paginator {
 		Data:  mo,
 		Total: 0,
 	}
+}
+
+func (rest RestRequest) User() (authenticate.Authenticate, error) {
+	guard := rest.r.GetCtxVar("guard").Interface().(guards.Guard)
+	ctx := rest.r.Context()
+	if u := guard.User(ctx); u != nil {
+		return u, nil
+	}
+	u, err := guard.GetUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rest.r.SetCtx(guard.SetUser(ctx, u))
+	return u, nil
+}
+
+func (rest RestRequest) GetUser() (authenticate.Authenticate, error) {
+	guard := rest.r.GetCtxVar("guard").Interface().(guards.Guard)
+	return guard.GetUser(rest.r.Context())
 }

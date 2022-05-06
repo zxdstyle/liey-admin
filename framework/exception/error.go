@@ -21,3 +21,10 @@ var (
 var (
 	ErrPluginExists = errors.New("duplicate plugin name or duplicate registered plugin")
 )
+
+// auth
+var (
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrMissingToken = errors.New("token not provider")
+	ErrInvalidToken = errors.New("invalid token")
+)
