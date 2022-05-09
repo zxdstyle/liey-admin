@@ -2,7 +2,6 @@ package requests
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/zxdstyle/liey-admin/framework/auth/authenticate"
 	"github.com/zxdstyle/liey-admin/framework/auth/guards"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	"github.com/zxdstyle/liey-admin/framework/validator"
@@ -113,21 +112,18 @@ func (rest RestRequest) Paginator(mo interface{}) *responses.Paginator {
 	}
 }
 
-func (rest RestRequest) User() (authenticate.Authenticate, error) {
-	guard := rest.r.GetCtxVar("guard").Interface().(guards.Guard)
-	ctx := rest.r.Context()
-	if u := guard.User(ctx); u != nil {
-		return u, nil
+func (rest RestRequest) Guard() guards.Guard {
+	guard := rest.r.GetCtxVar("guard")
+	if guard.IsNil() {
+		return nil
 	}
-	u, err := guard.GetUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-	rest.r.SetCtx(guard.SetUser(ctx, u))
-	return u, nil
+	return guard.Interface().(guards.Guard)
 }
 
-func (rest RestRequest) GetUser() (authenticate.Authenticate, error) {
-	guard := rest.r.GetCtxVar("guard").Interface().(guards.Guard)
-	return guard.GetUser(rest.r.Context())
+func (rest RestRequest) ID() uint {
+	guard := rest.Guard()
+	if guard == nil {
+		return 0
+	}
+	return guard.ID(rest.r.Context())
 }

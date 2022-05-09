@@ -10,9 +10,7 @@ type (
 	Guard interface {
 		Login(auth authenticate.Authenticate) (interface{}, error)
 		Check(ctx context.Context, param interface{}) (context.Context, error)
-		SetUser(ctx context.Context, auth authenticate.Authenticate) context.Context
-		User(ctx context.Context) authenticate.Authenticate
-		GetUser(ctx context.Context) (auth authenticate.Authenticate, err error)
+		ID(ctx context.Context) uint
 	}
 )
 

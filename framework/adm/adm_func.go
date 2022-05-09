@@ -18,8 +18,8 @@ func Debug() bool {
 	return g.Cfg("app").MustGet(ctx, "debug", false).Bool()
 }
 
-func DB() *gorm.DB {
-	return instances.DB()
+func DB(name ...string) *gorm.DB {
+	return instances.DB(name...)
 }
 
 func Start() {

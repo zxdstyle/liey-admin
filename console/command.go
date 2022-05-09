@@ -18,6 +18,7 @@ func init() {
 	rootCommand.AddCommand(commands.ServerCommand)
 	rootCommand.AddCommand(commands.VersionCommand)
 	rootCommand.AddCommand(commands.MigrateCommand)
+	rootCommand.AddCommand(commands.PublishCommand)
 }
 
 func Execute() {

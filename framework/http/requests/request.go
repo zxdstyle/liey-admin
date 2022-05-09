@@ -23,6 +23,8 @@ type (
 		GetSelects() Selects
 		GetOrder() (Orders, error)
 		ToQuery(tx *gorm.DB) (*gorm.DB, error)
+		// 当前授权用户标识
+		ID() uint
 	}
 )
 

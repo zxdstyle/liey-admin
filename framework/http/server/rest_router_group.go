@@ -44,6 +44,10 @@ func (router RouterGroup) Group(prefix string, handle func(group *RouterGroup)) 
 	})
 }
 
+func (router RouterGroup) Middleware(handlers ...ghttp.HandlerFunc) {
+	router.group.Middleware(handlers...)
+}
+
 func wrapHandler(handler RestHandlerFunc) ghttp.HandlerFunc {
 	return func(r *ghttp.Request) {
 		resp, err := handler(r.Context(), requests.ParseRequest(r))

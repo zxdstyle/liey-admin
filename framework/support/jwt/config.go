@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Secret               string
+	Secret               []byte
 	Issuer               string
 	TTL                  int
 	RefreshTTL           int
@@ -14,7 +14,7 @@ type Config struct {
 }
 
 var defaultConfig = Config{
-	Secret:               "liey-admin-secret-key",
+	Secret:               []byte("liey-admin-secret-key"),
 	Issuer:               "liey-admin",
 	TTL:                  3600,
 	RefreshTTL:           60 * 60 * 24 * 7,

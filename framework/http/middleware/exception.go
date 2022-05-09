@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"github.com/go-playground/validator/v10"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/zxdstyle/liey-admin/framework/exception"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	validate "github.com/zxdstyle/liey-admin/framework/validator"
 	"gorm.io/gorm"
@@ -12,6 +14,9 @@ import (
 var exceptions = map[error]func(err error) *responses.Response{
 	gorm.ErrRecordNotFound: func(err error) *responses.Response {
 		return responses.Error(err, http.StatusNotFound)
+	},
+	exception.ErrUnauthorized: func(err error) *responses.Response {
+		return responses.Error(err, http.StatusUnauthorized)
 	},
 }
 
@@ -48,6 +53,10 @@ func rejectError(err error) (resp *responses.Response) {
 	switch err.(type) {
 	case validator.ValidationErrors:
 		return responses.Failed(validate.FirstErrorMsg(err.(validator.ValidationErrors)), http.StatusUnprocessableEntity)
+	case *gerror.Error:
+		return responses.Failed(err.Error(), gerror.Code(err).Code())
+	case nil:
+		return responses.Failed("Internal Server Error", http.StatusInternalServerError)
 	default:
 		if exce, ok := exceptions[err]; ok {
 			return exce(err)

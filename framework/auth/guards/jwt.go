@@ -3,15 +3,18 @@ package guards
 import (
 	"context"
 	"github.com/zxdstyle/liey-admin/framework/auth/authenticate"
-	"github.com/zxdstyle/liey-admin/framework/database"
 	"github.com/zxdstyle/liey-admin/framework/exception"
 	JWT "github.com/zxdstyle/liey-admin/framework/support/jwt"
 )
 
-type JWTGuard struct {
-	jwt  *JWT.JWT
-	auth authenticate.Authenticate
-}
+type (
+	JWTGuard struct {
+		jwt  *JWT.JWT
+		auth authenticate.Authenticate
+	}
+
+	contextKey string
+)
 
 func NewJWTGuard(auth authenticate.Authenticate) *JWTGuard {
 	return &JWTGuard{
@@ -21,7 +24,7 @@ func NewJWTGuard(auth authenticate.Authenticate) *JWTGuard {
 }
 
 func (g JWTGuard) Login(auth authenticate.Authenticate) (interface{}, error) {
-	return g.jwt.CreateToken(auth.Guard(), auth.GetKey())
+	return g.jwt.CreateToken(auth)
 }
 
 func (g JWTGuard) Check(ctx context.Context, param interface{}) (context.Context, error) {
@@ -35,31 +38,17 @@ func (g JWTGuard) Check(ctx context.Context, param interface{}) (context.Context
 		return ctx, err
 	}
 
-	if claims.Guard != g.auth.Guard() {
+	if claims.Guard != g.auth.GuardName() {
 		return ctx, exception.ErrInvalidToken
 	}
 
-	return context.WithValue(ctx, "AuthorityId", claims.AuthId), nil
+	return context.WithValue(ctx, contextKey(g.auth.GuardName()), claims.AuthId), nil
 }
 
-func (g JWTGuard) SetUser(ctx context.Context, auth authenticate.Authenticate) context.Context {
-	return context.WithValue(ctx, authority, auth)
-}
-
-func (g JWTGuard) User(ctx context.Context) authenticate.Authenticate {
-	val := ctx.Value(authority)
+func (g JWTGuard) ID(ctx context.Context) uint {
+	val := ctx.Value(contextKey(authorityID))
 	if val == nil {
-		return nil
+		return 0
 	}
-	return val.(authenticate.Authenticate)
-}
-
-func (g JWTGuard) GetUser(ctx context.Context) (auth authenticate.Authenticate, err error) {
-	db := "default"
-	if val, ok := g.auth.(database.Connector); ok {
-		db = val.Connection()
-	}
-	err = database.GetDB(db).WithContext(ctx).First(&auth, ctx.Value(authorityID)).Error
-
-	return
+	return val.(uint)
 }

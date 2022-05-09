@@ -6,17 +6,42 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/zxdstyle/liey-admin/framework/database/migrations"
 	"github.com/zxdstyle/liey-admin/framework/exception"
+	"github.com/zxdstyle/liey-admin/framework/support/publish"
 )
+
+var pluginsMap = gmap.NewStrAnyMap(true)
 
 type (
 	Plugin interface {
 		Name() string
 		Boot() error
 		Migrations() []migrations.Migration
+		Resources() []publish.Publisher
+	}
+
+	defaultPlugin struct {
+		name       string
+		boot       func() error
+		migrations []migrations.Migration
+		resources  []publish.Publisher
 	}
 )
 
-var pluginsMap = gmap.NewStrAnyMap(true)
+func (p defaultPlugin) Name() string {
+	return p.name
+}
+
+func (p defaultPlugin) Boot() error {
+	return p.boot()
+}
+
+func (p defaultPlugin) Migrations() []migrations.Migration {
+	return p.migrations
+}
+
+func (p defaultPlugin) Resources() []publish.Publisher {
+	return p.resources
+}
 
 func RegisterPlugin(ctx context.Context, plugins ...Plugin) error {
 	for i, plugin := range plugins {
@@ -33,9 +58,22 @@ func RegisterPlugin(ctx context.Context, plugins ...Plugin) error {
 			return err
 		}
 
+		if err := publish.RegisterPublishes(name, plugin.Resources()...); err != nil {
+			return err
+		}
+
 		pluginsMap.SetIfNotExist(name, plugins[i])
 
 		g.Log().Noticef(ctx, "success to register plugin: %s", plugin.Name())
 	}
 	return nil
+}
+
+func WithRename(plugin Plugin, name string) Plugin {
+	return defaultPlugin{
+		name:       name,
+		boot:       plugin.Boot,
+		migrations: plugin.Migrations(),
+		resources:  plugin.Resources(),
+	}
 }

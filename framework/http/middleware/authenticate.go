@@ -1,27 +1,35 @@
 package middleware
 
 import (
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/zxdstyle/liey-admin/framework/auth"
-	"github.com/zxdstyle/liey-admin/framework/http/responses"
-	"net/http"
+	"github.com/zxdstyle/liey-admin/framework/exception"
+	"github.com/zxdstyle/liey-admin/framework/support/jwt"
 )
 
 func Authenticate(guardName string) func(r *ghttp.Request) {
 	return func(r *ghttp.Request) {
 		token := r.GetHeader("Authorization")
 		if len(token) == 0 {
-			failed(r, "Unauthorized", http.StatusUnauthorized)
+			r.SetError(exception.ErrMissingToken)
+			return
 		}
 
 		guard, er := auth.Guard(guardName)
 		if er != nil {
-			failed(r, er.Error(), http.StatusInternalServerError)
+			r.SetError(gerror.NewCode(exception.CodeInternalError, er.Error()))
+			return
 		}
 
 		ctx, err := guard.Check(r.Context(), token)
 		if err != nil {
-			failed(r, err.Error(), http.StatusUnauthorized)
+			if err == jwt.TokenExpired {
+
+			}
+
+			r.SetError(err)
+			return
 		}
 
 		r.SetCtx(ctx)
@@ -30,10 +38,4 @@ func Authenticate(guardName string) func(r *ghttp.Request) {
 
 		r.Middleware.Next()
 	}
-}
-
-func failed(r *ghttp.Request, message string, code int) {
-	r.Response.ClearBuffer()
-	r.Response.WriteHeader(code)
-	r.Response.WriteJsonExit(responses.Failed(message, code))
 }

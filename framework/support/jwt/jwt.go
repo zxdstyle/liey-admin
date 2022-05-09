@@ -1,9 +1,9 @@
 package jwt
 
 import (
-	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/zxdstyle/liey-admin/framework/auth/authenticate"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -12,13 +12,6 @@ type JWT struct {
 	sfl *singleflight.Group
 }
 
-var (
-	TokenExpired     = errors.New("token is expired")
-	TokenNotValidYet = errors.New("token not active yet")
-	TokenMalformed   = errors.New("that's not even a token")
-	TokenInvalid     = errors.New("couldn't handle this token")
-)
-
 func NewJWT() *JWT {
 	return &JWT{
 		cfg: GetConfig(),
@@ -26,8 +19,8 @@ func NewJWT() *JWT {
 	}
 }
 
-func (j *JWT) CreateToken(guard string, authId uint) (string, error) {
-	claims := NewClaims(guard, authId, j.cfg)
+func (j *JWT) CreateToken(auth authenticate.Authenticate) (string, error) {
+	claims := NewClaims(auth.GuardName(), auth.GetKey(), j.cfg)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.cfg.Secret)
 }
@@ -71,7 +64,7 @@ func (j *JWT) RefreshToken(oldToken string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return j.CreateToken(claims.Guard, claims.AuthId)
+		return j.CreateToken(authenticate.NewDefaultAuthenticate(claims.AuthId, claims.Guard))
 	})
 	return res.(string), err
 }

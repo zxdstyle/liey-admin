@@ -1,30 +1,30 @@
 package exception
 
 import (
-	"errors"
+	"github.com/gogf/gf/v2/errors/gerror"
 )
 
 // kernel
 var (
-	ErrNotRegisterKernel      = errors.New("please register the kernel")
-	ErrRepeatedRegisterKernel = errors.New("please do not repeated register the kernel")
+	ErrNotRegisterKernel      = gerror.NewCode(CodeInternalError, "please register the kernel")
+	ErrRepeatedRegisterKernel = gerror.NewCode(CodeInternalError, "please do not repeated register the kernel")
 
-	ErrInvalidOrderArgument = errors.New("invalid sort parameter")
+	ErrInvalidOrderArgument = gerror.NewCode(CodeBadRequest, "invalid sort parameter")
 )
 
 // migration
 var (
-	ErrRepeatedMigration = errors.New("migration already exists")
+	ErrRepeatedMigration = gerror.NewCode(CodeBadRequest, "migration already exists")
 )
 
 // plugin
 var (
-	ErrPluginExists = errors.New("duplicate plugin name or duplicate registered plugin")
+	ErrPluginExists = gerror.NewCode(CodeInternalError, "duplicate plugin name or duplicate registered plugin")
 )
 
 // auth
 var (
-	ErrUnauthorized = errors.New("unauthorized")
-	ErrMissingToken = errors.New("token not provider")
-	ErrInvalidToken = errors.New("invalid token")
+	ErrUnauthorized = gerror.NewCode(CodeUnauthorized, "unauthorized")
+	ErrMissingToken = gerror.NewCode(CodeInternalError, "token not provider")
+	ErrInvalidToken = gerror.NewCode(CodeUnauthorized, "invalid token")
 )
