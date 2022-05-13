@@ -3,9 +3,9 @@ package middleware
 import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/zxdstyle/liey-admin/framework/auth"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/zxdstyle/liey-admin/framework/exception"
-	"github.com/zxdstyle/liey-admin/framework/support/jwt"
+	"github.com/zxdstyle/liey-admin/framework/support"
 )
 
 func Authenticate(guardName string) func(r *ghttp.Request) {
@@ -16,25 +16,27 @@ func Authenticate(guardName string) func(r *ghttp.Request) {
 			return
 		}
 
-		guard, er := auth.Guard(guardName)
+		claims, er := support.JWT().ParseToken(token)
 		if er != nil {
-			r.SetError(gerror.NewCode(exception.CodeInternalError, er.Error()))
+			r.SetError(gerror.NewCode(exception.CodeUnauthorized, er.Error()))
 			return
 		}
 
-		ctx, err := guard.Check(r.Context(), token)
-		if err != nil {
-			if err == jwt.TokenExpired {
-
+		if claims.ExpiresAt.Unix()-gtime.Now().Unix() < 10 {
+			newToken, err := support.JWT().RefreshToken(token)
+			if err != nil {
+				r.SetError(err)
 			}
+			r.Response.Header().Set("Authorization", newToken)
+		}
 
-			r.SetError(err)
+		if claims.Guard != guardName {
+			r.SetError(gerror.NewCode(exception.CodeUnauthorized, "Invalid token"))
 			return
 		}
 
-		r.SetCtx(ctx)
-
-		r.SetCtxVar("guard", guard)
+		r.SetCtxVar("guard", guardName)
+		r.SetCtxVar("AuthID", claims.AuthId)
 
 		r.Middleware.Next()
 	}

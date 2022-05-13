@@ -22,8 +22,12 @@ func DB(name ...string) *gorm.DB {
 	return instances.DB(name...)
 }
 
-func Start() {
+func Start(kernel instances.Kernel) {
 	ctx := context.Background()
+
+	if err := instances.RegisterKernel(kernel); err != nil {
+		g.Log().Fatal(ctx, err)
+	}
 
 	bootstrap(ctx)
 

@@ -7,6 +7,7 @@ import (
 	"github.com/zxdstyle/liey-admin/framework/database/migrations"
 	"github.com/zxdstyle/liey-admin/framework/exception"
 	"github.com/zxdstyle/liey-admin/framework/support/publish"
+	"github.com/zxdstyle/liey-admin/framework/support/publish/publisher"
 )
 
 var pluginsMap = gmap.NewStrAnyMap(true)
@@ -16,14 +17,14 @@ type (
 		Name() string
 		Boot() error
 		Migrations() []migrations.Migration
-		Resources() []publish.Publisher
+		Resources() []publisher.Publisher
 	}
 
 	defaultPlugin struct {
 		name       string
 		boot       func() error
 		migrations []migrations.Migration
-		resources  []publish.Publisher
+		resources  []publisher.Publisher
 	}
 )
 
@@ -39,7 +40,7 @@ func (p defaultPlugin) Migrations() []migrations.Migration {
 	return p.migrations
 }
 
-func (p defaultPlugin) Resources() []publish.Publisher {
+func (p defaultPlugin) Resources() []publisher.Publisher {
 	return p.resources
 }
 
@@ -48,10 +49,6 @@ func RegisterPlugin(ctx context.Context, plugins ...Plugin) error {
 		name := plugin.Name()
 		if pluginsMap.Contains(name) {
 			return exception.ErrPluginExists
-		}
-
-		if err := plugin.Boot(); err != nil {
-			return err
 		}
 
 		if err := migrations.RegisterMigration(name, plugin.Migrations()...); err != nil {
@@ -67,6 +64,16 @@ func RegisterPlugin(ctx context.Context, plugins ...Plugin) error {
 		g.Log().Noticef(ctx, "success to register plugin: %s", plugin.Name())
 	}
 	return nil
+}
+
+func Iterator(handler func(name string, plugin Plugin) error) {
+	pluginsMap.Iterator(func(k string, v interface{}) bool {
+		p := v.(Plugin)
+		if err := handler(k, p); err != nil {
+			return false
+		}
+		return true
+	})
 }
 
 func WithRename(plugin Plugin, name string) Plugin {

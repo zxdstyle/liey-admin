@@ -19,6 +19,7 @@ func init() {
 	rootCommand.AddCommand(commands.VersionCommand)
 	rootCommand.AddCommand(commands.MigrateCommand)
 	rootCommand.AddCommand(commands.PublishCommand)
+	rootCommand.AddCommand(commands.QueueCommand)
 }
 
 func Execute() {

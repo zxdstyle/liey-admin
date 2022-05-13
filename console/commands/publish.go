@@ -40,8 +40,8 @@ func publishData(ctx context.Context, keys ...string) {
 	if len(data) == 0 {
 		logger.Fatal(ctx, "no resources to publish")
 	}
-	for name, datum := range data {
-		if err := datum.Publish(name); err != nil {
+	for _, datum := range data {
+		if err := datum.Publish(); err != nil {
 			logger.Fatal(ctx, err)
 		}
 	}

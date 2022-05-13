@@ -45,8 +45,6 @@ func (UniqueRule) Rule() validator.FuncCtx {
 		}
 
 		p := fl.Parent()
-		val, _, _, _ := fl.GetStructFieldOKAdvanced2(fl.Parent(), "id")
-		fmt.Println(p.FieldByName("ID").Interface(), val, db, table, field)
 		var count int64
 		query := database.GetDB(db).WithContext(ctx).Table(table).Where(fmt.Sprintf("`%s` = ?", field), fl.Field().Interface())
 

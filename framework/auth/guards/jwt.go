@@ -27,6 +27,9 @@ func (g JWTGuard) Login(auth authenticate.Authenticate) (interface{}, error) {
 	return g.jwt.CreateToken(auth)
 }
 
+func (g JWTGuard) ParseToken() {
+
+}
 func (g JWTGuard) Check(ctx context.Context, param interface{}) (context.Context, error) {
 	token, ok := param.(string)
 	if !ok {

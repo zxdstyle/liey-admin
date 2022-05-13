@@ -13,4 +13,5 @@ var (
 	CodeBadRequest       = gcode.New(http.StatusBadRequest, "Invalid Parameter", nil)          // The given parameter for current operation is invalid.
 	CodeUnauthorized     = gcode.New(http.StatusUnauthorized, "Not Authorized", nil)           // Not Authorized.
 	CodeNotFound         = gcode.New(http.StatusNotFound, "Not Found", nil)                    // Resource does not exist.
+	CodeForbidden        = gcode.New(http.StatusForbidden, "Forbidden", nil)                   // Resource does not exist.
 )

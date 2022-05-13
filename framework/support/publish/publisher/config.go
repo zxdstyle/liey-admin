@@ -6,22 +6,27 @@ import (
 )
 
 type Config struct {
-	source []byte
+	sources []Publishable
 }
 
-func NewConfigPublisher(source []byte) Config {
-	return Config{source: source}
+func NewConfigPublisher(sources []Publishable) Config {
+	return Config{sources: sources}
 }
 
-func (c Config) Source() []byte {
-	return c.source
+func (c Config) Sources() []Publishable {
+	return c.sources
 }
 
-func (c Config) Publish(name string) error {
-	path := fmt.Sprintf("config/%s.yaml", name)
-	if gfile.Exists(path) {
-		return fmt.Errorf("%s already exists", path)
+func (c Config) Publish() error {
+	for _, source := range c.sources {
+		path := source.Path
+		if gfile.Exists(path) {
+			return fmt.Errorf("%s already exists", path)
+		}
+
+		if err := gfile.PutBytes(path, source.Content); err != nil {
+			return err
+		}
 	}
-
-	return gfile.PutBytes(path, c.Source())
+	return nil
 }

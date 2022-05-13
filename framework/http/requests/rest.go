@@ -2,7 +2,6 @@ package requests
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/zxdstyle/liey-admin/framework/auth/guards"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	"github.com/zxdstyle/liey-admin/framework/validator"
 	"gorm.io/gorm"
@@ -112,18 +111,6 @@ func (rest RestRequest) Paginator(mo interface{}) *responses.Paginator {
 	}
 }
 
-func (rest RestRequest) Guard() guards.Guard {
-	guard := rest.r.GetCtxVar("guard")
-	if guard.IsNil() {
-		return nil
-	}
-	return guard.Interface().(guards.Guard)
-}
-
 func (rest RestRequest) ID() uint {
-	guard := rest.Guard()
-	if guard == nil {
-		return 0
-	}
-	return guard.ID(rest.r.Context())
+	return rest.r.GetCtxVar("AuthID").Uint()
 }

@@ -1,8 +1,9 @@
-package adm
+package instances
 
 import (
 	"github.com/zxdstyle/liey-admin/framework/exception"
 	"github.com/zxdstyle/liey-admin/framework/plugins"
+	"github.com/zxdstyle/liey-admin/framework/queue/job"
 	"sync"
 )
 
@@ -10,6 +11,7 @@ type (
 	Kernel interface {
 		Boot()
 		Plugins() []plugins.Plugin
+		Queues() []job.Job
 	}
 )
 
