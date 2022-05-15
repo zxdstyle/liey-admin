@@ -3,9 +3,9 @@ package middleware
 import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/zxdstyle/liey-admin/framework/exception"
 	"github.com/zxdstyle/liey-admin/framework/support"
+	"github.com/zxdstyle/liey-admin/framework/support/jwt"
 )
 
 func Authenticate(guardName string) func(r *ghttp.Request) {
@@ -18,16 +18,18 @@ func Authenticate(guardName string) func(r *ghttp.Request) {
 
 		claims, er := support.JWT().ParseToken(token)
 		if er != nil {
-			r.SetError(gerror.NewCode(exception.CodeUnauthorized, er.Error()))
-			return
-		}
+			if er != jwt.TokenRefresh {
+				r.SetError(gerror.NewCode(exception.CodeUnauthorized, er.Error()))
+				return
+			}
 
-		if claims.ExpiresAt.Unix()-gtime.Now().Unix() < 10 {
-			newToken, err := support.JWT().RefreshToken(token)
-			if err != nil {
+			newToken, err := support.JWT().RefreshToken(claims)
+			if err != nil && err != jwt.TokenRefresh {
 				r.SetError(err)
+				return
 			}
 			r.Response.Header().Set("Authorization", newToken)
+
 		}
 
 		if claims.Guard != guardName {

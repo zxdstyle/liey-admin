@@ -76,7 +76,7 @@ func InitQueueWithConfig() {
 	for name, q := range queue {
 		qu, err := newQueueWithConfig(name, q)
 		if err != nil {
-			g.Log().Error(ctx, err)
+			g.Log().Error(ctx, fmt.Errorf("failed to init queue, err: %s", err.Error()))
 			continue
 		}
 		if e := Register(name, qu); e != nil {
@@ -107,7 +107,7 @@ func Dispatch(j job.Job, payload interface{}) error {
 	name := job.ResolveQueue(j)
 	q := GetQueue(name)
 	if q == nil {
-		return fmt.Errorf("invalid queue: %s", name)
+		return fmt.Errorf("not found queue: %s", name)
 	}
 	p, err := j.Serialize(payload)
 	if err != nil {

@@ -27,6 +27,10 @@ func (n Nsq) Connect(connName string) (contract.Connection, error) {
 	if err != nil {
 		return nil, err
 	}
+	if val == nil {
+		return nil, fmt.Errorf("Missing configuration for connection `%s`", connName)
+	}
+
 	var cfg Config
 	if err := val.Scan(&cfg); err != nil {
 		return nil, err

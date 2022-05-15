@@ -25,6 +25,6 @@ var (
 // auth
 var (
 	ErrUnauthorized = gerror.NewCode(CodeUnauthorized, "unauthorized")
-	ErrMissingToken = gerror.NewCode(CodeInternalError, "token not provider")
+	ErrMissingToken = gerror.NewCode(CodeUnauthorized, "token not provider")
 	ErrInvalidToken = gerror.NewCode(CodeUnauthorized, "invalid token")
 )

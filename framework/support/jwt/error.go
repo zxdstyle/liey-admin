@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	TokenRefresh     = gerror.NewCode(exception.CodeUnauthorized, "token need refresh")
 	TokenExpired     = gerror.NewCode(exception.CodeUnauthorized, "token is expired")
 	TokenNotValidYet = gerror.NewCode(exception.CodeUnauthorized, "token not active yet")
 	TokenMalformed   = gerror.NewCode(exception.CodeUnauthorized, "that's not even a token")

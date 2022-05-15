@@ -2,9 +2,12 @@ package jwt
 
 import (
 	"fmt"
+	"github.com/gogf/gf/v2/crypto/gmd5"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/zxdstyle/liey-admin/framework/auth/authenticate"
 	"golang.org/x/sync/singleflight"
+	"time"
 )
 
 type JWT struct {
@@ -26,45 +29,54 @@ func (j *JWT) CreateToken(auth authenticate.Authenticate) (string, error) {
 }
 
 func (j *JWT) ParseToken(tokenStr string) (*Claims, error) {
+	tokenStr = gstr.ReplaceByMap(tokenStr, map[string]string{
+		"Bearer ": "",
+		"bearer ": "",
+	})
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return j.cfg.Secret, nil
 	})
-	if err == nil && token != nil {
-		claims, ok := token.Claims.(*Claims)
-		if ok && token.Valid {
-			return claims, nil
-		}
+	if token == nil {
 		return nil, TokenInvalid
 	}
 
-	if ve, ok := err.(*jwt.ValidationError); ok {
-		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-			return nil, TokenMalformed
-		}
-
-		if ve.Errors&jwt.ValidationErrorExpired != 0 {
-			// Token is expired
-			return nil, TokenExpired
-		}
-
-		if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-			return nil, TokenNotValidYet
-		}
-
-		return nil, TokenInvalid
+	claims, ok := token.Claims.(*Claims)
+	if ok {
+		return claims, j.injectError(claims, err)
 	}
-
 	return nil, TokenInvalid
 }
 
-func (j *JWT) RefreshToken(oldToken string) (string, error) {
-	key := fmt.Sprintf("JWT:REFRESH: %s", oldToken)
+func (j *JWT) RefreshToken(claims *Claims) (string, error) {
+	key := fmt.Sprintf("JWT:REFRESH: %s", gmd5.MustEncrypt(claims))
 	res, err, _ := j.sfl.Do(key, func() (interface{}, error) {
-		claims, err := j.ParseToken(oldToken)
-		if err != nil {
-			return "", err
-		}
 		return j.CreateToken(authenticate.NewDefaultAuthenticate(claims.AuthId, claims.Guard))
 	})
 	return res.(string), err
+}
+
+func (j *JWT) injectError(claims *Claims, err error) error {
+	if err == nil || claims == nil {
+		return nil
+	}
+	ve, ok := err.(*jwt.ValidationError)
+	if !ok {
+		return err
+	}
+
+	switch ve.Errors {
+	case jwt.ValidationErrorMalformed:
+		return TokenMalformed
+	case jwt.ValidationErrorNotValidYet:
+		return TokenNotValidYet
+	case jwt.ValidationErrorExpired:
+		fmt.Println(claims.RefreshAt.Unix(), claims.ExpiresAt.Unix())
+		expire := uint(time.Now().Unix() - claims.ExpiresAt.Unix())
+		if expire > claims.GracePeriod {
+			return TokenExpired
+		}
+		return TokenRefresh
+	default:
+		return TokenInvalid
+	}
 }

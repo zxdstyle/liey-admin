@@ -21,7 +21,7 @@ var (
 				wg.Add(1)
 				q := queue.GetQueue(name)
 				if q == nil {
-					g.Log().Fatal(ctx, fmt.Errorf("invalid queue name: %s", name))
+					g.Log().Fatal(ctx, fmt.Errorf("not found queue: %s", name))
 				}
 				go func(q *queue.Queue) {
 					defer wg.Done()

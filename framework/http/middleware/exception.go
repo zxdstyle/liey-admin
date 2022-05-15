@@ -16,7 +16,13 @@ var exceptions = map[error]func(err error) *responses.Response{
 		return responses.Error(err, http.StatusNotFound)
 	},
 	exception.ErrUnauthorized: func(err error) *responses.Response {
-		return responses.Error(err, http.StatusUnauthorized)
+		return responses.Failed("Unauthorized", http.StatusUnauthorized)
+	},
+	exception.ErrMissingToken: func(err error) *responses.Response {
+		return responses.Failed("Unauthorized", http.StatusUnauthorized)
+	},
+	exception.ErrInvalidToken: func(err error) *responses.Response {
+		return responses.Failed("Unauthorized", http.StatusUnauthorized)
 	},
 }
 
@@ -50,17 +56,20 @@ func isSuccess(status int) bool {
 }
 
 func rejectError(err error) (resp *responses.Response) {
+	if ve, ok := err.(validator.ValidationErrors); ok {
+		return responses.Failed(validate.FirstErrorMsg(ve), http.StatusUnprocessableEntity)
+	}
+
+	if exec, ok := exceptions[err]; ok {
+		return exec(err)
+	}
+
 	switch err.(type) {
-	case validator.ValidationErrors:
-		return responses.Failed(validate.FirstErrorMsg(err.(validator.ValidationErrors)), http.StatusUnprocessableEntity)
 	case *gerror.Error:
 		return responses.Failed(err.Error(), gerror.Code(err).Code())
 	case nil:
 		return responses.Failed("Internal Server Error", http.StatusInternalServerError)
 	default:
-		if exce, ok := exceptions[err]; ok {
-			return exce(err)
-		}
 		return responses.Error(err, http.StatusBadRequest)
 	}
 }

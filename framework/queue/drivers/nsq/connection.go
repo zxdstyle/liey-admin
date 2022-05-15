@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 type Connection struct {
@@ -33,8 +34,11 @@ func NewConnection(cfg Config) (*Connection, error) {
 	}, nil
 }
 
-func (c *Connection) Produce(name string, payload []byte) error {
-	return c.producer.Publish(name, payload)
+func (c *Connection) Produce(name string, payload []byte, delay ...time.Duration) error {
+	if len(delay) == 0 {
+		return c.producer.Publish(name, payload)
+	}
+	return c.producer.DeferredPublish(name, delay[0], payload)
 }
 
 func (c *Connection) Close() {

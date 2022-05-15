@@ -8,9 +8,10 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	AuthId    uint
-	RefreshAt *jwt.NumericDate
-	Guard     string
+	AuthId      uint
+	RefreshAt   *jwt.NumericDate
+	Guard       string
+	GracePeriod uint
 }
 
 func NewClaims(guard string, authId uint, cfg Config) jwt.Claims {
@@ -22,8 +23,9 @@ func NewClaims(guard string, authId uint, cfg Config) jwt.Claims {
 			NotBefore: jwt.NewNumericDate(now.Time),
 			IssuedAt:  jwt.NewNumericDate(now.Time),
 		},
-		AuthId:    authId,
-		RefreshAt: jwt.NewNumericDate(now.Add(time.Duration(cfg.RefreshTTL) * time.Second).Time),
-		Guard:     guard,
+		AuthId:      authId,
+		RefreshAt:   jwt.NewNumericDate(now.Add(time.Duration(cfg.RefreshTTL) * time.Second).Time),
+		Guard:       guard,
+		GracePeriod: cfg.BlacklistGracePeriod,
 	}
 }
