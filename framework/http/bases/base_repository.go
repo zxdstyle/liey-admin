@@ -47,6 +47,14 @@ func (repo GormRepository) All(ctx context.Context, req requests.Request, mos Re
 	return tx.Limit(req.GetLimit()).Find(mos).Error
 }
 
+func (repo GormRepository) First(ctx context.Context, mo RepositoryModel) error {
+	tx := repo.Orm.WithContext(ctx)
+	if key := mo.GetKey(); key > 0 {
+		return tx.First(mo).Error
+	}
+	return tx.Where(mo).First(mo).Error
+}
+
 func (repo GormRepository) Show(ctx context.Context, with requests.Resources, mo RepositoryModel) error {
 	tx := repo.Orm.WithContext(ctx)
 	tx = repo.loadResources(tx, with, mo)

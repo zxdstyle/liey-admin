@@ -31,6 +31,7 @@ type (
 	Repository interface {
 		Paginate(ctx context.Context, req requests.Request, paginator *responses.Paginator) error
 		All(ctx context.Context, req requests.Request, mos RepositoryModels) error
+		First(ctx context.Context, mo RepositoryModel) error
 		Show(ctx context.Context, with requests.Resources, mo RepositoryModel) error
 		ExistsByKeys(ctx context.Context, keys []uint, exists *bool) error
 		Exists(ctx context.Context, mo RepositoryModel, exists *bool) error
