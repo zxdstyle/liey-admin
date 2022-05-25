@@ -2,6 +2,9 @@ package bases
 
 import (
 	"context"
+	"fmt"
+	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/builder"
+	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/clauses"
 	"github.com/zxdstyle/liey-admin/framework/http/requests"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	"gorm.io/gorm"
@@ -19,16 +22,18 @@ func NewGormRepository(db *gorm.DB) *GormRepository {
 }
 
 func (repo GormRepository) Paginate(ctx context.Context, req requests.Request, paginator *responses.Paginator) error {
-	tx, err := req.ToQuery(repo.Orm.WithContext(ctx))
-	if err != nil {
-		return err
+	mos, ok := paginator.Data.(RepositoryModels)
+	if !ok {
+		return fmt.Errorf("")
 	}
-
-	if er := tx.WithContext(ctx).Count(&paginator.Total).Error; er != nil {
+	query := req.ToQuery().WithContext(repo.Orm.WithContext(ctx), mos.GetModel(0))
+	tx, e := query.RawQuery()
+	if e != nil {
+		return e
+	}
+	if er := tx.Count(&paginator.Total).Error; er != nil {
 		return er
 	}
-
-	tx = repo.loadResources(tx, req.GetWithResources(), paginator.Data.(RepositoryModels).GetModel(0))
 
 	page := req.GetPage()
 	pageSize := req.GetPageSize()
@@ -37,13 +42,11 @@ func (repo GormRepository) Paginate(ctx context.Context, req requests.Request, p
 }
 
 func (repo GormRepository) All(ctx context.Context, req requests.Request, mos RepositoryModels) error {
-	tx, err := req.ToQuery(repo.Orm.WithContext(ctx))
+	query := req.ToQuery().WithContext(repo.Orm.WithContext(ctx), mos.GetModel(0))
+	tx, err := query.RawQuery()
 	if err != nil {
 		return err
 	}
-
-	tx = repo.loadResources(tx, req.GetWithResources(), mos.GetModel(0))
-
 	return tx.Limit(req.GetLimit()).Find(mos).Error
 }
 
@@ -55,9 +58,12 @@ func (repo GormRepository) First(ctx context.Context, mo RepositoryModel) error 
 	return tx.Where(mo).First(mo).Error
 }
 
-func (repo GormRepository) Show(ctx context.Context, with requests.Resources, mo RepositoryModel) error {
+func (repo GormRepository) Show(ctx context.Context, cls []clauses.Clause, mo RepositoryModel) error {
 	tx := repo.Orm.WithContext(ctx)
-	tx = repo.loadResources(tx, with, mo)
+	tx, err := builder.NewBuilder(cls).WithContext(tx, mo).RawQuery()
+	if err != nil {
+		return err
+	}
 	return tx.First(mo).Error
 }
 
@@ -126,9 +132,9 @@ func (repo GormRepository) loadResources(tx *gorm.DB, with requests.Resources, m
 	}
 
 	// 自定义预加载
-	if model, ok := mo.(HasPreload); ok {
+	if val, ok := mo.(HasPreload); ok {
 		for _, resource := range with {
-			preload := model.Preload(resource)
+			preload := val.Preload(resource)
 			if preload != nil {
 				tx = preload(tx)
 			}

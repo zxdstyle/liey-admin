@@ -2,9 +2,11 @@ package requests
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder"
+	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/builder"
+	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/clauses"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	"github.com/zxdstyle/liey-admin/framework/validator"
-	"gorm.io/gorm"
 )
 
 type (
@@ -44,47 +46,12 @@ func (rest RestRequest) ResourceID(key string) uint {
 	return rest.r.GetRouter(key).Uint()
 }
 
-func (rest RestRequest) GetWithResources() Resources {
-	if rest.with == nil {
-		rest.with = parseWith(rest.r)
-	}
-	return rest.with
+func (rest RestRequest) ToQuery() *builder.Builder {
+	return queryBuilder.NewBuilderFromRequest(rest.r)
 }
 
-func (rest RestRequest) GetSelects() Selects {
-	if rest.selects == nil {
-		rest.selects = parseSelects(rest.r)
-	}
-	return rest.selects
-}
-
-func (rest RestRequest) GetOrder() (Orders, error) {
-	if rest.orders == nil {
-		orders, err := parseOrder(rest.r)
-		if err != nil {
-			return nil, err
-		}
-		rest.orders = orders
-	}
-
-	return rest.orders, nil
-}
-
-func (rest RestRequest) ToQuery(tx *gorm.DB) (*gorm.DB, error) {
-	selects := rest.GetSelects()
-	if selects != nil && len(selects) > 0 {
-		tx = tx.Select(selects)
-	}
-
-	orders, err := rest.GetOrder()
-	if err != nil {
-		return tx, err
-	}
-	if orders != nil && len(orders) > 0 {
-		tx = orders.Query(tx)
-	}
-
-	return tx, nil
+func (rest RestRequest) GetClauses() []clauses.Clause {
+	return queryBuilder.ParseClauses(rest.r)
 }
 
 func (rest RestRequest) GetPage() int {

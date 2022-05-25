@@ -66,7 +66,11 @@ func rejectError(err error) (resp *responses.Response) {
 
 	switch err.(type) {
 	case *gerror.Error:
-		return responses.Failed(err.Error(), gerror.Code(err).Code())
+		code := gerror.Code(err).Code()
+		if code < http.StatusOK {
+			code = http.StatusInternalServerError
+		}
+		return responses.Failed(err.Error(), code)
 	case nil:
 		return responses.Failed("Internal Server Error", http.StatusInternalServerError)
 	default:

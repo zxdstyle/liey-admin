@@ -6,9 +6,14 @@ import (
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 )
 
-type BaseLogic struct {
-	repo Repository
-}
+type (
+	Logic interface {
+	}
+
+	BaseLogic struct {
+		repo Repository
+	}
+)
 
 func NewBaseLogic(repo Repository) *BaseLogic {
 	return &BaseLogic{repo}
@@ -22,8 +27,8 @@ func (b BaseLogic) All(ctx context.Context, req requests.Request, mos Repository
 	return b.repo.All(ctx, req, mos)
 }
 
-func (b BaseLogic) Show(ctx context.Context, with requests.Resources, mo RepositoryModel) error {
-	return b.repo.Show(ctx, with, mo)
+func (b BaseLogic) Show(ctx context.Context, req requests.Request, mo RepositoryModel) error {
+	return b.repo.Show(ctx, req.GetClauses(), mo)
 }
 
 func (b BaseLogic) Create(ctx context.Context, mo RepositoryModel) error {

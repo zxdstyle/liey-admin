@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	cfg            config.Config
-	connectionPool = gmap.NewStrAnyMap(true)
+	cfg                   config.Config
+	connectionPool        = gmap.NewStrAnyMap(true)
+	DefaultConnectionName = "default"
 )
 
 type (

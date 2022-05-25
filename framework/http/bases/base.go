@@ -3,6 +3,7 @@ package bases
 import (
 	"context"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/clauses"
 	"github.com/zxdstyle/liey-admin/framework/http/requests"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 	"gorm.io/gorm"
@@ -24,15 +25,11 @@ type (
 		Preload(resource requests.Resource) Filter
 	}
 
-	Logic interface {
-		Show(ctx context.Context, with []string, mo RepositoryModel) error
-	}
-
 	Repository interface {
 		Paginate(ctx context.Context, req requests.Request, paginator *responses.Paginator) error
 		All(ctx context.Context, req requests.Request, mos RepositoryModels) error
 		First(ctx context.Context, mo RepositoryModel) error
-		Show(ctx context.Context, with requests.Resources, mo RepositoryModel) error
+		Show(ctx context.Context, cls []clauses.Clause, mo RepositoryModel) error
 		ExistsByKeys(ctx context.Context, keys []uint, exists *bool) error
 		Exists(ctx context.Context, mo RepositoryModel, exists *bool) error
 		Count(ctx context.Context, mo RepositoryModel, count *int64) error
