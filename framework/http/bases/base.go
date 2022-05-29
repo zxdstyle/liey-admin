@@ -18,6 +18,7 @@ type (
 	}
 
 	RepositoryModels interface {
+		Len() int
 		GetModel(i int) RepositoryModel
 	}
 
@@ -40,6 +41,7 @@ type (
 		BatchUpdate(ctx context.Context, mos RepositoryModels) error
 		Destroy(ctx context.Context, mo RepositoryModel) error
 		DestroyById(ctx context.Context, ids ...uint) error
+		BatchDestroy(ctx context.Context, mos RepositoryModels) error
 	}
 
 	Filter func(tx *gorm.DB) *gorm.DB

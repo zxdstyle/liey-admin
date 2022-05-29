@@ -15,11 +15,7 @@ var rootCommand = &cobra.Command{
 }
 
 func init() {
-	rootCommand.AddCommand(commands.ServerCommand)
-	rootCommand.AddCommand(commands.VersionCommand)
-	rootCommand.AddCommand(commands.MigrateCommand)
-	rootCommand.AddCommand(commands.PublishCommand)
-	rootCommand.AddCommand(commands.QueueCommand)
+	rootCommand.AddCommand(commands.ServerCmd, commands.VersionCmd, commands.MigrateCmd, commands.PublishCmd, commands.QueueCmd)
 }
 
 func Execute() {

@@ -29,3 +29,17 @@ func (b *Builder) query(tx *gorm.DB) (*gorm.DB, error) {
 	}
 	return tx, err
 }
+
+func (b *Builder) filter(tx *gorm.DB) (*gorm.DB, error) {
+	mo := model.New(tx.Statement.Model)
+	var err error
+	for _, cla := range b.clauses {
+		if val, ok := cla.(clauses.Where); ok {
+			tx, err = val.Build(tx, mo)
+			if err != nil {
+				return tx, err
+			}
+		}
+	}
+	return tx, err
+}

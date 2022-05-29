@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	PublishCommand = &cobra.Command{
+	PublishCmd = &cobra.Command{
 		Use:   "publish",
 		Short: "Publish any publishable assets from plugin packages",
 		Run: func(cmd *cobra.Command, args []string) {

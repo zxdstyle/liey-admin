@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	MigrateCommand = &cobra.Command{
+	MigrateCmd = &cobra.Command{
 		Use:   "migrate",
 		Short: "Run the database migrations",
 		Run: func(cmd *cobra.Command, args []string) {

@@ -72,9 +72,11 @@ func (rest RestRequest) NeedPaginate() bool {
 
 func (rest RestRequest) Paginator(mo interface{}) *responses.Paginator {
 	return &responses.Paginator{
-		Page:  rest.GetPage(),
-		Data:  mo,
-		Total: 0,
+		Data: mo,
+		Meta: responses.Meta{
+			Page:  rest.GetPage(),
+			Total: 0,
+		},
 	}
 }
 

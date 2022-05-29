@@ -7,7 +7,7 @@ import (
 	"github.com/zxdstyle/liey-admin/framework/plugins"
 )
 
-var ServerCommand = &cobra.Command{
+var ServerCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start http server",
 	Run: func(cmd *cobra.Command, args []string) {

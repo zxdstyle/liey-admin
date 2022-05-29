@@ -12,3 +12,7 @@ type Statement struct {
 func (s *Statement) RawQuery() (*gorm.DB, error) {
 	return s.builder.query(s.tx)
 }
+
+func (s *Statement) Filter() (*gorm.DB, error) {
+	return s.builder.filter(s.tx)
+}

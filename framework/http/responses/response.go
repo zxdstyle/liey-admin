@@ -7,6 +7,7 @@ import (
 type (
 	Response struct {
 		Code    int         `json:"code"`
+		Meta    interface{} `json:"meta,omitempty"`
 		Message string      `json:"message"`
 		Data    interface{} `json:"data"`
 	}
@@ -14,6 +15,11 @@ type (
 
 func (e Response) Error() string {
 	return e.Message
+}
+
+func (e *Response) WithMeta(meta interface{}) *Response {
+	e.Meta = meta
+	return e
 }
 
 func Error(err error, code int) *Response {

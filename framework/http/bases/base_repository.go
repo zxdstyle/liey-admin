@@ -31,7 +31,7 @@ func (repo GormRepository) Paginate(ctx context.Context, req requests.Request, p
 	if e != nil {
 		return e
 	}
-	if er := tx.Count(&paginator.Total).Error; er != nil {
+	if er := tx.Count(&paginator.Meta.Total).Error; er != nil {
 		return er
 	}
 
@@ -117,13 +117,24 @@ func (repo GormRepository) Destroy(ctx context.Context, mo RepositoryModel) erro
 }
 
 func (repo GormRepository) DestroyById(ctx context.Context, ids ...uint) error {
+	if len(ids) == 0 {
+		return nil
+	}
 	query := repo.Orm.WithContext(ctx)
 	if len(ids) > 1 {
 		query = query.Where("id IN ?", ids)
 	} else {
 		query = query.Where("id = ?", ids[0])
 	}
-	return query.Delete(repo.Orm.Statement.Model).Error
+	return query.Delete(&repo.Orm.Statement.Model).Error
+}
+
+func (repo GormRepository) BatchDestroy(ctx context.Context, mos RepositoryModels) error {
+	var keys []uint
+	for i := 0; i < mos.Len(); i++ {
+		keys = append(keys, mos.GetModel(i).GetKey())
+	}
+	return repo.DestroyById(ctx, keys...)
 }
 
 func (repo GormRepository) loadResources(tx *gorm.DB, with requests.Resources, mo RepositoryModel) *gorm.DB {

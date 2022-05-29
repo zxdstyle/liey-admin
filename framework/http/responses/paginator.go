@@ -1,12 +1,13 @@
 package responses
 
 type (
-	PaginatorData interface {
+	Meta struct {
+		Page  int   `json:"page"`
+		Total int64 `json:"total"`
 	}
 
 	Paginator struct {
-		Page  int           `json:"page"`
-		Data  PaginatorData `json:"data"`
-		Total int64         `json:"total"`
+		Data interface{} `json:"data"`
+		Meta Meta        `json:"meta"`
 	}
 )

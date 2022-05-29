@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	wg           = &sync.WaitGroup{}
-	QueueCommand = &cobra.Command{
+	wg       = &sync.WaitGroup{}
+	QueueCmd = &cobra.Command{
 		Use:   "queue [name]",
 		Short: "listen to these given queues",
 		Run: func(cmd *cobra.Command, args []string) {

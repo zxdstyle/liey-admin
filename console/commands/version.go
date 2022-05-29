@@ -10,7 +10,7 @@ import (
 	"runtime"
 )
 
-var VersionCommand = &cobra.Command{
+var VersionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version information",
 	Run: func(cmd *cobra.Command, args []string) {
