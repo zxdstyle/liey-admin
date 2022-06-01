@@ -2,6 +2,8 @@ package bases
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/zxdstyle/liey-admin/framework/exception"
 	"github.com/zxdstyle/liey-admin/framework/http/requests"
 	"github.com/zxdstyle/liey-admin/framework/http/responses"
 )
@@ -28,6 +30,10 @@ func (b BaseLogic) All(ctx context.Context, req requests.Request, mos Repository
 }
 
 func (b BaseLogic) Show(ctx context.Context, req requests.Request, mo RepositoryModel) error {
+	if mo.GetKey() == 0 {
+		return gerror.NewCode(exception.CodeNotFound, "not found record")
+	}
+
 	return b.repo.Show(ctx, req.GetClauses(), mo)
 }
 
