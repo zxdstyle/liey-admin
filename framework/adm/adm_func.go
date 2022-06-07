@@ -37,3 +37,7 @@ func Start(kernel instances.Kernel) {
 func Server() *server.RestServer {
 	return instances.RestServer()
 }
+
+func Cli() {
+	console.Execute()
+}
