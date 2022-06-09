@@ -6,6 +6,10 @@ import (
 	"github.com/zxdstyle/liey-admin/console"
 	"github.com/zxdstyle/liey-admin/framework/adm/instances"
 	"github.com/zxdstyle/liey-admin/framework/http/server"
+	"github.com/zxdstyle/liey-admin/framework/logger"
+	"github.com/zxdstyle/liey-admin/framework/plugins"
+	"github.com/zxdstyle/liey-admin/framework/queue"
+	"github.com/zxdstyle/liey-admin/framework/queue/job"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +19,8 @@ func Version() string {
 
 func Debug() bool {
 	ctx := context.Background()
-	return g.Cfg("app").MustGet(ctx, "debug", false).Bool()
+	res, _ := g.Cfg("app").Get(ctx, "debug", false)
+	return res.Bool()
 }
 
 func DB(name ...string) *gorm.DB {
@@ -25,19 +30,25 @@ func DB(name ...string) *gorm.DB {
 func Start(kernel instances.Kernel) {
 	ctx := context.Background()
 
-	if err := instances.RegisterKernel(kernel); err != nil {
-		g.Log().Fatal(ctx, err)
-	}
+	g.Log().SetHandlers(logger.LoggingColorHandler)
 
-	bootstrap(ctx)
+	kernel.Boot()
+
+	if hk, ok := kernel.(instances.HttpKernel); ok {
+		if err := plugins.RegisterPlugin(ctx, hk.Plugins()...); err != nil {
+			g.Log().Fatal(ctx, err)
+		}
+
+		if err := job.RegisterJob(ctx, hk.Queues()...); err != nil {
+			g.Log().Fatal(ctx, err)
+		}
+
+		queue.InitQueueWithConfig()
+	}
 
 	console.Execute()
 }
 
 func Server() *server.RestServer {
 	return instances.RestServer()
-}
-
-func Cli() {
-	console.Execute()
 }

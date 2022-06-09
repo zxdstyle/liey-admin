@@ -15,7 +15,11 @@ var rootCommand = &cobra.Command{
 }
 
 func init() {
-	rootCommand.AddCommand(commands.ServerCmd, commands.VersionCmd, commands.MigrateCmd, commands.PublishCmd, commands.QueueCmd)
+	RegisterCmd(commands.ServerCmd, commands.VersionCmd, commands.MigrateCmd, commands.PublishCmd, commands.QueueCmd)
+}
+
+func RegisterCmd(commands ...*cobra.Command) {
+	rootCommand.AddCommand(commands...)
 }
 
 func Execute() {

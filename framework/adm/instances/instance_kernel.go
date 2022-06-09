@@ -10,6 +10,9 @@ import (
 type (
 	Kernel interface {
 		Boot()
+	}
+
+	HttpKernel interface {
 		Plugins() []plugins.Plugin
 		Queues() []job.Job
 	}
