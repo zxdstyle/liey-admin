@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/zxdstyle/liey-admin/console"
 	"github.com/zxdstyle/liey-admin/framework/adm/instances"
+	"github.com/zxdstyle/liey-admin/framework/events"
 	"github.com/zxdstyle/liey-admin/framework/http/server"
 	"github.com/zxdstyle/liey-admin/framework/logger"
 	"github.com/zxdstyle/liey-admin/framework/plugins"
@@ -51,4 +52,8 @@ func Start(kernel instances.Kernel) {
 
 func Server() *server.RestServer {
 	return instances.RestServer()
+}
+
+func ListenEvent(event events.Event, subscribers ...events.Subscriber) {
+	events.Listen(event, subscribers...)
 }
