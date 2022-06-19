@@ -2,6 +2,7 @@ package requests
 
 import (
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/zxdstyle/liey-admin/framework/gates"
 	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder"
 	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/builder"
 	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/clauses"
@@ -12,9 +13,7 @@ import (
 type (
 	RestRequest struct {
 		r       *ghttp.Request
-		with    Resources
-		selects Selects
-		orders  Orders
+		clauses *[]clauses.Clause
 	}
 )
 
@@ -47,11 +46,22 @@ func (rest RestRequest) ResourceID(key string) uint {
 }
 
 func (rest RestRequest) ToQuery() *builder.Builder {
-	return queryBuilder.NewBuilderFromRequest(rest.r)
+	return queryBuilder.NewBuilderFromRequest(rest.GetClauses())
 }
 
-func (rest RestRequest) GetClauses() []clauses.Clause {
-	return queryBuilder.ParseClauses(rest.r)
+func (rest *RestRequest) GetClauses() []clauses.Clause {
+	if rest.clauses == nil {
+		clause := queryBuilder.ParseClauses(rest.r)
+		rest.clauses = &clause
+	}
+	return *rest.clauses
+}
+
+func (rest *RestRequest) AddClauses(clauses ...clauses.Clause) {
+	if rest.clauses == nil {
+		rest.GetClauses()
+	}
+	*rest.clauses = append(*rest.clauses, clauses...)
 }
 
 func (rest RestRequest) GetPage() int {
@@ -82,4 +92,12 @@ func (rest RestRequest) Paginator(mo interface{}) *responses.Paginator {
 
 func (rest RestRequest) ID() uint {
 	return rest.r.GetCtxVar("AuthID").Uint()
+}
+
+func (rest RestRequest) Can() error {
+	gate, err := gates.Casbin()
+	if err != nil {
+		return err
+	}
+	return gate.Can(rest.ID(), rest.r.RequestURI, rest.r.Method)
 }

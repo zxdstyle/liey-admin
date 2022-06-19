@@ -102,6 +102,9 @@ func (repo GormRepository) BatchCreate(ctx context.Context, mos RepositoryModels
 }
 
 func (repo GormRepository) Update(ctx context.Context, mo RepositoryModel) error {
+	if mo.GetKey() == 0 {
+		return fmt.Errorf("missing primary key")
+	}
 	if err := repo.Orm.WithContext(ctx).Omit(clause.Associations).Model(mo).Updates(mo).Error; err != nil {
 		return err
 	}

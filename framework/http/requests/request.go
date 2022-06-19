@@ -22,6 +22,7 @@ type (
 		NeedPaginate() bool
 		ToQuery() *builder.Builder
 		GetClauses() []clauses.Clause
+		AddClauses(clauses ...clauses.Clause)
 		// ID 当前授权用户标识
 		ID() uint
 	}

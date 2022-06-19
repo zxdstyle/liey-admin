@@ -37,7 +37,6 @@ func ParseClauses(r *ghttp.Request) []clauses.Clause {
 	return cls
 }
 
-func NewBuilderFromRequest(r *ghttp.Request) *builder.Builder {
-	cls := ParseClauses(r)
+func NewBuilderFromRequest(cls []clauses.Clause) *builder.Builder {
 	return builder.NewBuilder(cls)
 }
