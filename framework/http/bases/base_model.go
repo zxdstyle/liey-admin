@@ -31,8 +31,16 @@ func (m Model) GetCreatedAt() *gtime.Time {
 	return m.CreatedAt
 }
 
+func (m *Model) SetCreatedAt(ct *gtime.Time) {
+	m.CreatedAt = ct
+}
+
 func (m Model) GetUpdatedAt() *gtime.Time {
 	return m.UpdatedAt
+}
+
+func (m *Model) SetUpdatedAt(ut *gtime.Time) {
+	m.UpdatedAt = ut
 }
 
 func (c CreateOnlyModel) GetKey() uint {
@@ -47,8 +55,16 @@ func (c CreateOnlyModel) GetCreatedAt() *gtime.Time {
 	return c.CreatedAt
 }
 
+func (c *CreateOnlyModel) SetCreatedAt(ct *gtime.Time) {
+	c.CreatedAt = ct
+}
+
 func (c CreateOnlyModel) GetUpdatedAt() *gtime.Time {
 	return nil
+}
+
+func (c *CreateOnlyModel) SetUpdatedAt(ut *gtime.Time) {
+
 }
 
 func (c OnlyKeyModel) GetKey() uint {
@@ -63,6 +79,12 @@ func (c OnlyKeyModel) GetCreatedAt() *gtime.Time {
 	return nil
 }
 
+func (c *OnlyKeyModel) SetCreatedAt(ct *gtime.Time) {
+}
+
 func (c OnlyKeyModel) GetUpdatedAt() *gtime.Time {
 	return nil
+}
+
+func (c *OnlyKeyModel) SetUpdatedAt(ut *gtime.Time) {
 }
