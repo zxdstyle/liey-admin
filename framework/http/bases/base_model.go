@@ -1,6 +1,9 @@
 package bases
 
-import "github.com/gogf/gf/v2/os/gtime"
+import (
+	"github.com/gogf/gf/v2/os/gtime"
+	"gorm.io/gorm"
+)
 
 type (
 	Model struct {
@@ -33,6 +36,10 @@ func (m Model) GetCreatedAt() *gtime.Time {
 
 func (m Model) GetUpdatedAt() *gtime.Time {
 	return m.UpdatedAt
+}
+
+func (m Model) BeforeSave(tx *gorm.DB) error {
+	return nil
 }
 
 func (c CreateOnlyModel) GetKey() uint {

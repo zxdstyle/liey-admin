@@ -1,5 +1,7 @@
 package events
 
-type Event interface {
-	Payload() interface{}
-}
+type (
+	Event interface {
+		Payload() interface{}
+	}
+)

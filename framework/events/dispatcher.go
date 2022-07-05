@@ -27,7 +27,8 @@ func wrapSubscriberWithPayload(subscriber Subscriber, payload interface{}) subsc
 	return subscriberWithPayload{payload: payload, subscriber: subscriber}
 }
 
-func Dispatch(ctx context.Context, event Event) error {
+func Dispatch(event Event) error {
+	ctx := context.Background()
 	subscribers, err := getSubscribers(event)
 	if err != nil {
 		return err
