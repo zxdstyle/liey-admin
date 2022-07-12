@@ -14,7 +14,9 @@ type (
 		GetKey() uint
 		SetKey(id uint)
 		GetCreatedAt() *gtime.Time
+		SetCreatedAt(*gtime.Time)
 		GetUpdatedAt() *gtime.Time
+		SetUpdatedAt(*gtime.Time)
 	}
 
 	RepositoryModels interface {

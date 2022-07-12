@@ -3,6 +3,7 @@ package bases
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/builder"
 	"github.com/zxdstyle/liey-admin/framework/http/queryBuilder/clauses"
 	"github.com/zxdstyle/liey-admin/framework/http/requests"
@@ -94,6 +95,7 @@ func (repo GormRepository) CountByKeys(ctx context.Context, keys []uint, count *
 }
 
 func (repo GormRepository) Create(ctx context.Context, mo RepositoryModel) error {
+	mo.SetCreatedAt(gtime.Now())
 	return repo.Orm.WithContext(ctx).Omit(clause.Associations).Create(mo).Error
 }
 

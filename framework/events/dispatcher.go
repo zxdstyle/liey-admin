@@ -1,60 +1,43 @@
 package events
 
 import (
-	"context"
-	"github.com/gogf/gf/v2/frame/g"
+	"fmt"
+	"sync"
 )
 
-var eventsBus = make(chan subscriberWithPayload, 1024)
-
-// todo waitDone 优雅退出
-func init() {
-	go doInit()
+type Bus struct {
+	sync.RWMutex
+	// storage user custom Event instance.
+	events map[string]Event[any]
+	// storage all event name and ListenerQueue map
+	listeners map[string]ListenerSorted[any]
 }
 
-type subscriberWithPayload struct {
-	payload    interface{}
-	subscriber Subscriber
-}
+func (b *Bus) Subscribe(event Event[any], listeners ...Listener[any]) {
+	b.Lock()
+	defer b.Unlock()
 
-func (s subscriberWithPayload) Consume(ctx context.Context) {
-	if err := s.subscriber.Handle(ctx, s.payload); err != nil {
-		g.Log().Error(ctx, err)
-	}
-}
-
-func wrapSubscriberWithPayload(subscriber Subscriber, payload interface{}) subscriberWithPayload {
-	return subscriberWithPayload{payload: payload, subscriber: subscriber}
-}
-
-func Dispatch(event Event) error {
-	ctx := context.Background()
-	subscribers, err := getSubscribers(event)
-	if err != nil {
-		return err
+	name := b.resolveEventName(event)
+	for _, listener := range listeners {
+		b.events[name] = event
+		b.addListenerItem(name, &ListenerItem[any]{Listener: listener})
 	}
 
-	for _, subscriber := range subscribers {
-		if asyncSubscriber, ok := subscriber.(AsyncSubscriber); ok && asyncSubscriber.Async() {
-			eventsBus <- wrapSubscriberWithPayload(asyncSubscriber, event.Payload())
-			continue
-		}
+}
 
-		if e := subscriber.Handle(ctx, event.Payload()); e != nil {
-			return e
+func (b *Bus) addListenerItem(name string, item *ListenerItem[any]) {
+
+}
+
+func (b *Bus) resolveEventName(e Event[any]) string {
+	event, ok := e.(NamedEvent)
+	if ok {
+		name := event.Name()
+		if len(name) > 0 {
+			return name
 		}
 	}
-	return nil
-}
 
-func doInit() {
-	ctx := context.Background()
-	for {
-		select {
-		case <-ctx.Done():
-			break
-		case subscriber := <-eventsBus:
-			go subscriber.Consume(ctx)
-		}
-	}
+	// struct
+	return fmt.Sprintf("%T", e)
 }
