@@ -1,6 +1,8 @@
 package adm
 
-import "github.com/gogf/gf/v2/container/gmap"
+import (
+	"github.com/gogf/gf/v2/container/gmap"
+)
 
 var providers = gmap.NewAnyAnyMap(true)
 

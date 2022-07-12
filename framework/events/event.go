@@ -1,7 +1,11 @@
 package events
 
 type (
-	Event interface {
-		Payload() interface{}
+	Event[V any] interface {
+		Payload() V
+	}
+
+	NamedEvent interface {
+		Name() string
 	}
 )
