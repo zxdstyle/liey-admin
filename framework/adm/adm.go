@@ -1,15 +1,14 @@
 package adm
 
 import (
-	"github.com/gogf/gf/v2/container/gmap"
+	"context"
+	"github.com/zxdstyle/liey-admin/framework/events"
 )
 
-var providers = gmap.NewAnyAnyMap(true)
+func Subscribe[T any](e events.Event[T], subscribers ...events.Subscriber[T]) {
+	//events.DefaultBus.Subscribe(e, subscribers...)
+}
 
-type SingletonKey string
-
-func Singleton(key SingletonKey, initializer func() interface{}) interface{} {
-	return providers.GetOrSetFuncLock(key, func() interface{} {
-		return initializer()
-	})
+func Dispatch(ctx context.Context, e events.Event[any]) {
+	//events.DefaultBus.Dispatch(ctx, e)
 }
