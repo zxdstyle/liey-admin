@@ -1,13 +1,13 @@
-`liey-admin` 是一个基于 `goFrame` 框架构建的后台系统脚手架，仅需少量代码即可快速构建出一个功能完善的后台系统，大大提高工作效率。内置大量基础业务组件，开箱即用。
+`liey-admin` is a background system scaffolding based on the `goFrame` framework. It only needs a small amount of code to quickly build a fully functional background system, which greatly improves work efficiency. Built-in a large number of basic business components, out of the box.
 
-### 功能特性
-- [x] 用户管理
-- [x] RBAC权限管理
-- [x] 自定义菜单管理
-- [ ] 插件功能
-- [ ] debug 调试插件，监控队列允许、SQL监控、性能分析
+### Features
+- [x] User Management
+- [x] RBAC authority management
+- [x] Custom Menu Management
+- [ ] plug-in function
+- [ ] debug Debug plugin, monitoring queue permission, SQL monitoring, performance analysis
 
-### 环境要求
+### Environmental requirements
 - Golang >= 1.17
 
 ### JetBrains open source certificate support
